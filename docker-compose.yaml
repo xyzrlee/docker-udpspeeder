@@ -1,0 +1,8 @@
+version: '3'
+services:
+    udpspeeder:
+        build: .
+        image: xyzrlee/udpspeeder
+        #restart: unless-stopped
+        network_mode: "host"
+        command: -s -l0.0.0.0:4096 -r127.0.0.1:7777  -f20:10 -k "passwd" --mode 0
