@@ -29,4 +29,4 @@ RUN set -ex \
 
 USER root
 
-ENTRYPOINT [ "speederv2", "--disable-color" ]
+ENTRYPOINT [ "speederv2" ]
