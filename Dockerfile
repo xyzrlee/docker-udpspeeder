@@ -2,8 +2,7 @@
 # Dockerfile for udpspeeder
 #
 
-FROM alpine
-LABEL maintainer="Ricky Li <cnrickylee@gmail.com>"
+FROM alpine AS builder
 
 RUN set -ex \
  # Build environment setup
@@ -22,11 +21,16 @@ RUN set -ex \
  && cd UDPspeeder \
  && make \
  && install speederv2 /usr/local/bin \
- && cd / \
- && rm -rf /tmp/repo \
- && apk del .build-deps \
  && speederv2 --help
 
-USER root
+# ------------------------------------------------
+
+FROM alpine
+
+COPY --from=builder /usr/local/bin/speederv2 /usr/local/bin/speederv2
+
+RUN set -ex \
+ # Build environment setup
+ && speederv2 --help
 
 ENTRYPOINT [ "speederv2" ]
