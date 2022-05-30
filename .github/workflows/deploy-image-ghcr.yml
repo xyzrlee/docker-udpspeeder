@@ -5,6 +5,7 @@ on:
 env:
   IMAGE_NAME: udpspeeder
   TAG_LATEST: latest
+  TAG_DEV: dev
   TAG_CURRENT: v$(date +%Y%m%d)
 
 jobs:
@@ -15,18 +16,21 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@v2
     - name: Build
-      run: | 
+      run: |
         docker build \
-        --tag ghcr.io/$GITHUB_ACTOR/${{env.IMAGE_NAME}}:${{env.TAG_CURRENT}} \
-        --tag ghcr.io/$GITHUB_ACTOR/${{env.IMAGE_NAME}}:${{env.TAG_LATEST}} \
+        --tag ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}:${{env.TAG_CURRENT}} \
+        --tag ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}:${{env.TAG_LATEST}} \
+        --tag ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}:${{env.TAG_DEV}} \
         .
-    - name: Docker login
-      if: ${{ github.ref_name == 'master' }}
-      run: >-
-        echo "${{ secrets.GITHUB_TOKEN }}"
-        | docker login -u "${{ github.actor }}" --password-stdin ghcr.io
-    - name: Push image to GitHub
+    - name: Push image to GitHub - master
       if: ${{ github.ref_name == 'master' }}
       run: |
-        docker push ghcr.io/$GITHUB_ACTOR/${{env.IMAGE_NAME}}:${{env.TAG_CURRENT}}
-        docker push ghcr.io/$GITHUB_ACTOR/${{env.IMAGE_NAME}}:${{env.TAG_LATEST}}
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login -u "${{ github.actor }}" --password-stdin ghcr.io
+        docker push ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}:${{env.TAG_CURRENT}}
+        docker push ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}:${{env.TAG_LATEST}}
+    - name: Push image to GitHub - dev
+      if: ${{ startsWith(github.ref_name, 'dev-') }}
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login -u "${{ github.actor }}" --password-stdin ghcr.io
+        docker push ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}:${{env.TAG_DEV}}
+

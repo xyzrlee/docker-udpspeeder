@@ -33,4 +33,6 @@ RUN set -ex \
  # Build environment setup
  && speederv2 --help
 
+USER nobody
+
 ENTRYPOINT [ "speederv2" ]
