@@ -2,7 +2,7 @@
 # Dockerfile for udpspeeder
 #
 
-FROM alpine AS builder
+FROM --platform=$BUILDPLATFORM alpine AS builder
 
 RUN set -ex \
  # Build environment setup
@@ -25,7 +25,7 @@ RUN set -ex \
 
 # ------------------------------------------------
 
-FROM alpine
+FROM --platform=$BUILDPLATFORM alpine
 
 COPY --from=builder /usr/local/bin/speederv2 /usr/local/bin/speederv2
 
